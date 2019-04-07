@@ -25,15 +25,9 @@ func main() {
 	anaconda.SetConsumerKey(os.Getenv("TWITTER_CONSUMER_KEY"))
 	anaconda.SetConsumerSecret(os.Getenv("TWITTER_CONSUMER_SECRET"))
 	twitterApi := anaconda.NewTwitterApi(os.Getenv("TWITTER_ACCESS_TOKEN"), os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"))
-	fmt.Println(os.Getenv("TWITTER_CONSUMER_KEY"))
-	fmt.Println(os.Getenv("TWITTER_CONSUMER_SECRET"))
-	fmt.Println(os.Getenv("TWITTER_ACCESS_TOKEN"))
-	fmt.Println(os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"))
-	fmt.Println(os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
 	v := url.Values{}
 	v.Set("screen_name", os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
 	v.Set("count", "200")
-	fmt.Println(v)
 	tweets, err := twitterApi.GetUserTimeline(v)
 	if err != nil {
 		panic(err)
