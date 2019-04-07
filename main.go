@@ -28,6 +28,7 @@ func main() {
 	v := url.Values{}
 	v.Set("screen_name", os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
 	v.Set("count", "200")
+	fmt.Println(v)
 	tweets, err := twitterApi.GetUserTimeline(v)
 	if err != nil {
 		panic(err)
