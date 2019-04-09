@@ -12,7 +12,6 @@ import (
 func main() {
 
 	type Tweet struct {
-		gorm.Model
 		TwitterID string `gorm:"unique_index"`
 		Tweet     string `gorm:"type:varchar(1024)"`
 	}
