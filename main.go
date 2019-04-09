@@ -26,14 +26,14 @@ func main() {
 
 	s3file, err := svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_S3_BUCKET")),
-		Key:    aws.String(os.Getenv("/tweets.tar.gz")),
+		Key:    aws.String("/tweets.tar.xz"),
 	})
 	if err != nil {
 		panic(err)
 	}
 	defer s3file.Body.Close()
 
-	file, err := os.Create("/tmp/tweets.tar.gz")
+	file, err := os.Create("/tmp/tweets.tar.xz")
 	if err != nil {
 		panic(err)
 	}
