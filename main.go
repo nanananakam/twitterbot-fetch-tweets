@@ -13,7 +13,7 @@ func main() {
 
 	type Tweet struct {
 		TwitterID string `gorm:"unique_index"`
-		Tweet     string `gorm:"type:varchar(1024)"`
+		Tweet     string `gorm:"type:varchar(512)"`
 	}
 
 	db, err := gorm.Open("sqlite3", "tweets.db")
