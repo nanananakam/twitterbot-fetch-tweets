@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -15,6 +16,10 @@ import (
 )
 
 func main() {
+	lambda.Start(Main)
+}
+
+func Main() {
 
 	type Tweet struct {
 		TwitterID string `gorm:"unique_index"`
