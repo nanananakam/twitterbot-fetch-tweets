@@ -67,6 +67,7 @@ func Main() {
 	if err != nil {
 		panic(err)
 	}
+	count := 0
 	tx := db.Begin()
 	for _, tweet := range tweets {
 		var tweetDb Tweet
@@ -76,22 +77,27 @@ func Main() {
 				TwitterID: fmt.Sprint(tweet.Id),
 			}
 			tx.Create(&tweetDb)
+			count = count + 1
 		}
 	}
 	tx.Commit()
 
-	if err := exec.Command("sh", "-c", "cd /tmp && tar Jcvf tweets.tar.xz tweets.db").Run(); err != nil {
-		panic(err)
-	}
+	if count > 0 {
 
-	file2, err := os.Open("/tmp/tweets.tar.xz")
+		if err := exec.Command("sh", "-c", "cd /tmp && tar Jcvf tweets.tar.xz tweets.db").Run(); err != nil {
+			panic(err)
+		}
 
-	if _, err = svc.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("AWS_S3_BUCKET")),
-		Key:    aws.String("/tweets.tar.xz"),
-		Body:   file2,
-	}); err != nil {
-		panic(err)
+		file2, err := os.Open("/tmp/tweets.tar.xz")
+
+		if _, err = svc.PutObject(&s3.PutObjectInput{
+			Bucket: aws.String(os.Getenv("AWS_S3_BUCKET")),
+			Key:    aws.String("/tweets.tar.xz"),
+			Body:   file2,
+		}); err != nil {
+			panic(err)
+		}
+
 	}
 
 	if err := exec.Command("sh", "-c", "rm -rf /tmp/*").Run(); err != nil {
