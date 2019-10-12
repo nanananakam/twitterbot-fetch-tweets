@@ -70,10 +70,11 @@ func Main() {
 	count := 0
 	tx := db.Begin()
 	for _, tweet := range tweets {
+		fmt.Println(tweet.FullText)
 		var tweetDb Tweet
 		if db.Where("twitter_id = ?", fmt.Sprint(tweet.Id)).First(&tweetDb).RecordNotFound() {
 			tweetDb := Tweet{
-				Tweet:     tweet.Text,
+				Tweet:     tweet.FullText,
 				TwitterID: fmt.Sprint(tweet.Id),
 			}
 			tx.Create(&tweetDb)
