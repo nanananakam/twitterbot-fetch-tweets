@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"io"
+	"math"
 	"net/url"
 	"os"
 	"os/exec"
@@ -60,25 +61,41 @@ func Main() {
 	anaconda.SetConsumerKey(os.Getenv("TWITTER_CONSUMER_KEY"))
 	anaconda.SetConsumerSecret(os.Getenv("TWITTER_CONSUMER_SECRET"))
 	twitterApi := anaconda.NewTwitterApi(os.Getenv("TWITTER_ACCESS_TOKEN"), os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"))
-	v := url.Values{}
-	v.Set("screen_name", os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
-	v.Set("count", "200")
-	tweets, err := twitterApi.GetUserTimeline(v)
-	if err != nil {
-		panic(err)
-	}
+	var maxId int64
+	maxId = math.MaxInt64
 	count := 0
 	tx := db.Begin()
-	for _, tweet := range tweets {
-		fmt.Println(tweet.FullText)
-		var tweetDb Tweet
-		if db.Where("twitter_id = ?", fmt.Sprint(tweet.Id)).First(&tweetDb).RecordNotFound() {
-			tweetDb := Tweet{
-				Tweet:     tweet.FullText,
-				TwitterID: fmt.Sprint(tweet.Id),
+	for {
+		v := url.Values{}
+		v.Set("screen_name", os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
+		v.Set("count", "200")
+		if maxId < math.MaxInt64 {
+			v.Set("max_id", fmt.Sprint(maxId))
+		}
+		tweets, err := twitterApi.GetUserTimeline(v)
+		if err != nil {
+			panic(err)
+		}
+		countLocal := 0
+		fmt.Println(maxId)
+		for _, tweet := range tweets {
+			countLocal = countLocal + 1
+			fmt.Println(tweet.FullText)
+			if tweet.Id < maxId {
+				maxId = tweet.Id - 1
 			}
-			tx.Create(&tweetDb)
-			count = count + 1
+			var tweetDb Tweet
+			if db.Where("twitter_id = ?", fmt.Sprint(tweet.Id)).First(&tweetDb).RecordNotFound() {
+				tweetDb := Tweet{
+					Tweet:     tweet.FullText,
+					TwitterID: fmt.Sprint(tweet.Id),
+				}
+				tx.Create(&tweetDb)
+				count = count + 1
+			}
+		}
+		if countLocal == 0 {
+			break
 		}
 	}
 	tx.Commit()
