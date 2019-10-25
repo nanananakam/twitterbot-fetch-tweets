@@ -66,6 +66,7 @@ func Main() {
 	count := 0
 	tx := db.Begin()
 	for {
+		fmt.Println(maxId)
 		v := url.Values{}
 		v.Set("screen_name", os.Getenv("TWITTER_TARGET_SCREEN_NAME"))
 		v.Set("count", "200")
@@ -79,8 +80,6 @@ func Main() {
 		countLocal := 0
 		fmt.Println(maxId)
 		for _, tweet := range tweets {
-			countLocal = countLocal + 1
-			fmt.Println(tweet.FullText)
 			if tweet.Id < maxId {
 				maxId = tweet.Id - 1
 			}
@@ -92,11 +91,13 @@ func Main() {
 				}
 				tx.Create(&tweetDb)
 				count = count + 1
+				countLocal = countLocal + 1
 			}
 		}
 		if countLocal == 0 {
 			break
 		}
+		fmt.Println(countLocal)
 	}
 	tx.Commit()
 
